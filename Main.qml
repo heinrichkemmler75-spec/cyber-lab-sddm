@@ -48,6 +48,7 @@ Item {
                 y: arm.pose.monitorY
                 accent: root.accent
                 animationProgress: motion.progress
+                foldAngle: motion.foldAngle
                 LoginPanel {
                     id: login
                     anchors.fill: parent
