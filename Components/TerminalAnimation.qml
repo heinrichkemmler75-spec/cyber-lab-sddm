@@ -8,10 +8,15 @@ Item {
     property int duration: 2000
     property real progress: 1
     property bool initialized: false
-    // 0–620 / 620–1100 / 1100–1340 / 1340–2000 ms at the default duration.
+    // Phase boundaries remain at 620 / 1100 / 1340 ms for the 2000 ms default.
+    // Start the next joint 50 ms before the preceding phase ends, for a
+    // small crossfade of motion rather than three isolated stop-and-go steps.
+    // Calculate overlap from milliseconds so it stays 50 ms if duration changes.
+    readonly property real overlap: duration > 0
+        ? Math.min(50 / duration, 0.025) : 0
     readonly property real swingProgress: ReferencePose.phase(progress, 0, 0.31)
-    readonly property real liftProgress: ReferencePose.phase(progress, 0.31, 0.55)
-    readonly property real unfoldProgress: ReferencePose.phase(progress, 0.55, 0.67)
+    readonly property real liftProgress: ReferencePose.phase(progress, 0.31 - overlap, 0.55)
+    readonly property real unfoldProgress: ReferencePose.phase(progress, 0.55 - overlap, 0.67)
     // Positive Z rotation is clockwise in Qt's screen coordinates.
     readonly property real baseAngle: -145 * (1 - swingProgress)
     readonly property real liftAngle: 65 * (1 - liftProgress)
