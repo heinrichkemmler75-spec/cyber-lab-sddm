@@ -45,7 +45,7 @@ FocusScope {
         id: scroll
         objectName: "formScroll"
         anchors.fill: parent
-        anchors.margins: 8
+        anchors.margins: 5
         contentWidth: width
         contentHeight: form.implicitHeight
         clip: true
@@ -63,22 +63,22 @@ FocusScope {
         ColumnLayout {
             id: form
             width: scroll.width
-            spacing: 5
+            spacing: 3
             Text {
                 text: "CYBER LAB / ZUGANG"
                 color: panel.accent
-                font.pixelSize: 12
+                font.pixelSize: 11
                 font.bold: true
                 Layout.fillWidth: true
                 elide: Text.ElideRight
             }
             RowLayout {
                 Layout.fillWidth: true
-                spacing: 8
+                spacing: 6
                 UserProfile {
                     objectName: "userProfile"
-                    Layout.preferredWidth: 56
-                    Layout.preferredHeight: 56
+                    Layout.preferredWidth: 45
+                    Layout.preferredHeight: 45
                     visible: panel.showAvatar
                     showName: false
                     users: panel.users
@@ -88,7 +88,7 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 4
+                    spacing: 2
                     GreenComboBox {
                         id: userChoice
                         objectName: "userChoice"
@@ -113,7 +113,7 @@ FocusScope {
                         id: password
                         objectName: "passwordField"
                         Layout.fillWidth: true
-                        implicitHeight: 26
+                        implicitHeight: 25
                         color: panel.accent
                         font.pixelSize: 13
                         placeholderText: "Passwort"
@@ -166,23 +166,26 @@ FocusScope {
                 onActiveFocusChanged: if (activeFocus)
                     scroll.reveal(this)
             }
-            Text {
-                objectName: "statusMessage"
+            RowLayout {
                 Layout.fillWidth: true
-                Layout.minimumHeight: 28
-                text: panel.errorMessage || (userChoice.count === 0 ? "Keine Benutzer verfügbar." : sessionChoice.count === 0 ? "Keine Desktop-Sitzungen verfügbar." : "")
-                color: panel.errorMessage ? "#ffb3a7" : panel.accent
-                wrapMode: Text.WordWrap
-                font.pixelSize: 12
-                Accessible.role: Accessible.StaticText
-                Accessible.name: text
-            }
-            SystemActions {
-                Layout.fillWidth: true
-                backend: panel.backend
-                accent: panel.accent
-                enabled: !panel.busy
-                onFocusRequested: control => scroll.reveal(control)
+                spacing: 4
+                Text {
+                    objectName: "statusMessage"
+                    Layout.fillWidth: true
+                    Layout.minimumHeight: 20
+                    text: panel.errorMessage || (userChoice.count === 0 ? "Keine Benutzer verfügbar." : sessionChoice.count === 0 ? "Keine Desktop-Sitzungen verfügbar." : "")
+                    color: panel.errorMessage ? "#ffb3a7" : panel.accent
+                    wrapMode: Text.WordWrap
+                    font.pixelSize: 10
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: text
+                }
+                SystemActions {
+                    backend: panel.backend
+                    accent: panel.accent
+                    enabled: !panel.busy
+                    onFocusRequested: control => scroll.reveal(control)
+                }
             }
         }
     }
