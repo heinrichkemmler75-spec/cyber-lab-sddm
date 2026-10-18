@@ -253,31 +253,26 @@ Item {
             verify(mid.y < low.y, "Joint 2 lifts, with no sideways sweep");
             compare(motion.baseAngle, 0);
             compare(motion.foldAngle, 65);
-            motion.progress = 0.55;
+            motion.progress = 0.59;
             const raised = wrist.mapToItem(reference, 0, 0);
             fuzzyCompare(raised.x, low.x, 0.01);
             verify(raised.y < mid.y);
             fuzzyCompare(elbow.mapToItem(reference, 0, 0).y, hinge.y, 0.01);
             compare(motion.liftAngle, 0);
-            verify(motion.foldAngle > 60 && motion.foldAngle <= 65);
-            // Geometry no longer collapses while unfolding. The underside
-            // is drawn with perspective sprites at its full mechanical size.
-            verify(monitor.openness >= 0 && monitor.openness < 0.1);
-            verify(monitor.foldAngle > 60);
-            motion.progress = 0.61;
-            verify(motion.foldAngle < 65 && motion.foldAngle > 0, "Counter-clockwise unfolding");
+            verify(motion.foldAngle > 60 && motion.foldAngle < 65);
+            // Monitor is full-size during the slow third phase; artwork
+            // presents a side/bottom view rather than shrinking the LCD.
+            verify(monitor.openness > 0 && monitor.openness < 0.1);
+            motion.progress = 0.72;
+            verify(motion.foldAngle < 65 && motion.foldAngle > 0, "Slow counter-clockwise unfolding");
             compare(motion.baseAngle, 0);
             compare(motion.liftAngle, 0);
             fuzzyCompare(wrist.mapToItem(reference, 0, 0).y, raised.y, 0.01);
-            motion.progress = 0.67;
-            checkMeasuredPose();
-            motion.progress = 0.77;
-            verify(Math.abs(motion.foldAngle) <= 0.6);
-            verify(Math.abs(motion.foldAngle) > 0);
-            compare(motion.baseAngle, 0);
-            compare(motion.liftAngle, 0);
             motion.progress = 0.90;
             checkMeasuredPose();
+            motion.progress = 0.945;
+            verify(Math.abs(motion.foldAngle) <= 0.45);
+            verify(Math.abs(motion.foldAngle) > 0);
             motion.progress = 1;
             checkMeasuredPose();
         }
@@ -304,7 +299,7 @@ Item {
             const motion = findChild(theme, "terminalAnimation");
             const monitor = findChild(theme, "monitor");
             const reference = findChild(theme, "referenceScene");
-            for (const boundary of [0.31, 0.55, 0.67, 0.77, 0.90]) {
+            for (const boundary of [0.31, 0.565, 0.59, 0.90, 0.945]) {
                 motion.progress = boundary - 0.0001;
                 const before = monitor.mapToItem(reference, 0, 0);
                 motion.progress = boundary + 0.0001;
@@ -313,7 +308,7 @@ Item {
                        "No visible position jump at a phase boundary");
             }
             for (let i = 0; i <= 24; ++i) {
-                motion.progress = 0.55 + 0.12 * i / 24;
+                motion.progress = 0.565 + 0.335 * i / 24;
                 const left = monitor.mapToItem(reference, 0, 0);
                 const right = monitor.mapToItem(reference, monitor.width, 0);
                 verify(right.x - left.x <= 404.01, "No perspective ballooning past final width: " + (right.x - left.x) + " at " + motion.progress);
