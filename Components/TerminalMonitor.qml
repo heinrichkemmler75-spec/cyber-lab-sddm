@@ -74,27 +74,40 @@ Item {
         smooth: true
         mipmap: true
     }
-    Row {
-        id: ledBar
-        objectName: "monitorLedBar"
+    // The existing yellow/white pixels are baked into the frame PNG.
+    // Cover precisely that bottom-bezel window with a dark housing plate,
+    // then draw the green progress segments over it.
+    Rectangle {
+        id: ledHousing
+        objectName: "monitorLedHousing"
         z: 4
         visible: monitor.openness >= 0.99
-        x: monitor.width * 0.405
-        y: monitor.height * 0.951
-        width: monitor.width * 0.17
-        height: Math.max(2, monitor.height * 0.019)
-        spacing: 1
-        readonly property int count: 12
-        Repeater {
-            model: ledBar.count
-            Rectangle {
-                required property int index
-                width: (ledBar.width - (ledBar.count - 1) * ledBar.spacing) / ledBar.count
-                height: ledBar.height
-                radius: Math.min(width, height) * 0.25
-                color: monitor.accent
-                opacity: index < Math.ceil(Math.max(0, Math.min(1, monitor.animationProgress)) * ledBar.count) ? 0.93 : 0.12
-                Behavior on opacity { NumberAnimation { duration: 95 } }
+        x: monitor.width * 0.358
+        y: monitor.height * 0.842
+        width: monitor.width * 0.180
+        height: Math.max(5, monitor.height * 0.034)
+        color: "#141a14"
+        border.color: "#353e2d"
+        border.width: 1
+        radius: 1
+        Row {
+            id: ledBar
+            objectName: "monitorLedBar"
+            anchors.fill: parent
+            anchors.margins: 2
+            spacing: 1
+            readonly property int count: 12
+            Repeater {
+                model: ledBar.count
+                Rectangle {
+                    required property int index
+                    width: (ledBar.width - (ledBar.count - 1) * ledBar.spacing) / ledBar.count
+                    height: ledBar.height
+                    radius: Math.min(width, height) * 0.25
+                    color: monitor.accent
+                    opacity: index < Math.ceil(Math.max(0, Math.min(1, monitor.animationProgress)) * ledBar.count) ? 0.97 : 0.10
+                    Behavior on opacity { NumberAnimation { duration: 95 } }
+                }
             }
         }
     }
