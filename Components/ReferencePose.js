@@ -41,7 +41,7 @@ function phase(t, start, end) {
 
 function latch(t) {
     // A single sub-degree excursion, then rest. No perpetual spring/oscillation.
-    if (t <= 0.67 || t >= 0.90) return 0;
-    if (t < 0.77) return 0.6 * phase(t, 0.67, 0.77);
-    return 0.6 * (1 - phase(t, 0.77, 0.90));
+    if (t <= 0.90 || t >= 1.0) return 0;
+    if (t < 0.945) return 0.45 * phase(t, 0.90, 0.945);
+    return 0.45 * (1 - phase(t, 0.945, 1.0));
 }
