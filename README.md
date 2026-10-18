@@ -186,3 +186,11 @@ Die Quell-PNGs werden **nicht verändert**. Vorhandene Anschlüsse und Proportio
 - Der Unterarm verwendet eine Kabelgrafik; am Oberarm folgt eine gezeichnete Kabelschlaufe der Gelenkprojektion. Das mittlere Gelenk und die Monitorhalterung verwenden unterschiedliche Grafiken.
 - Gesamtdauer und 50-ms-Phasenüberlappung unverändert: **2000 ms**.
 - Änderungen wurden im Repository gespeichert, sind jedoch noch **nicht auf dem Zielgerät visuell getestet**. Vor produktiver Aktivierung `./scripts/check.sh` und `./scripts/test.sh` ausführen; Kabelanschlüsse, Bildperspektiven und Tastaturbedienung prüfen.
+
+
+### Feinabstimmung am 18. Oktober 2026
+
+- Benutzerbild auf 62 Referenzpixel vergrößert, Sitzungsbeschriftung entfernt, Formular im Display um 15 Pixel nach unten versetzt und alle Eingabefelder durch 14-Pixel-Seitenränder enger gefasst. Systemaktionssymbole bleiben erhalten.
+- Bei unverändert **2000 ms** Gesamtdauer verlängert sich die Monitorklappung: Basis 0–620 ms, Anheben 570–1180 ms, Aufrichten 1130–1800 ms, sanftes Einrasten 1800–2000 ms. Die beiden 50-ms-Überlappungen bleiben bestehen.
+- Die grünen Statussegmente liegen jetzt auf einer dunklen Abdeckplatte genau über der ins Bild eingebrannten gelblichen Statusleiste im unteren Monitorrahmen. Die Original-PNG bleibt unangetastet; der visuelle Abgleich ist im Greeter noch erforderlich.
+- Die QML-Tests wurden an die neuen Phasengrenzen angepasst. Es wurde noch kein vollständiger Qt-/SDDM-Lauf auf dem Zielrechner durchgeführt.
