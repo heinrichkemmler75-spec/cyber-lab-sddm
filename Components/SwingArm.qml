@@ -51,6 +51,19 @@ Item {
             Item {
                 transform: Scale { yScale: 1 / arm.swingProjection }
 
+                // Cable harness routed under the lower mechanical beam.
+                Image {
+                    z: -1
+                    x: -8
+                    y: 16
+                    width: arm.pose.lowerLength
+                    height: 45
+                    source: "../Assets/arm/cable_bundle.png"
+                    rotation: arm.pose.shoulderAngle
+                    transformOrigin: Item.TopLeft
+                    fillMode: Image.Stretch
+                    smooth: true
+                }
                 ArmLink {
                     width: arm.pose.lowerLength
                     transform: Rotation { origin.y: 10; angle: arm.pose.shoulderAngle }
@@ -69,6 +82,37 @@ Item {
                     readonly property real projectedZ: -arm.upperY * Math.sin(radians) + modelDepth * Math.cos(radians)
                     readonly property real depthScale: 1 - 0.10 * Math.sin(radians)
 
+                    // Flexible cable loop between elbow and wrist; it follows
+                    // the second segment as the projection changes.
+                    Canvas {
+                        id: upperCable
+                        z: -1
+                        x: Math.min(0, arm.upperX) - 18
+                        y: Math.min(0, elbow.projectedY) - 25
+                        width: Math.abs(arm.upperX) + 48
+                        height: Math.abs(elbow.projectedY) + 70
+                        onPaint: {
+                            const p = getContext("2d");
+                            p.reset();
+                            const sx = 18 - x, sy = -y;
+                            const ex = arm.upperX - x, ey = elbow.projectedY - y;
+                            p.strokeStyle = "#151b18";
+                            p.lineWidth = 9;
+                            p.lineCap = "round";
+                            p.beginPath();
+                            p.moveTo(sx, sy);
+                            p.bezierCurveTo(sx + (ex-sx)*0.32, sy+46,
+                                           sx + (ex-sx)*0.70, ey+50, ex, ey);
+                            p.stroke();
+                            p.strokeStyle = "#66756c";
+                            p.lineWidth = 1.5;
+                            p.stroke();
+                        }
+                        Connections {
+                            target: elbow
+                            function onProjectedYChanged() { upperCable.requestPaint() }
+                        }
+                    }
                     ArmLink {
                         width: Math.hypot(arm.upperX, elbow.projectedY)
                         transform: Rotation {
@@ -88,17 +132,15 @@ Item {
                             objectName: "monitorMount"
                             scale: elbow.depthScale
                             transformOrigin: Item.TopLeft
-                            transform: [
-                                Rotation {
-                                    objectName: "monitorFoldRotation"
-                                    axis.x: 0; axis.y: 1; axis.z: 0
-                                    angle: arm.foldAngle
-                                },
-                                Scale {
-                                    xScale: 1 - 0.6 * Math.sin(Math.abs(arm.foldAngle) * Math.PI / 180)
-                                    yScale: arm.faceHeightScale
-                                }
-                            ]
+                            // Perspective/underside views are now drawn inside
+                            // TerminalMonitor. Never scale the entire login panel
+                            // during the final unfolding.
+                            // An identity transform preserves the calibrated pose.
+                            transform: Rotation {
+                                objectName: "monitorFoldRotation"
+                                axis.x: 0; axis.y: 1; axis.z: 0
+                                angle: 0
+                            }
                             // Real mechanical housing joins the wrist to the
                             // frame. The hidden beam keeps end-pose geometry
                             // stable without drawing across the login field.
@@ -127,7 +169,7 @@ Item {
                             }
                         }
                         ArmJoint {
-                            sprite: "../Assets/arm/elbow_joint.png"
+                            sprite: "../Assets/arm/monitor_mount.png"
                             accent: arm.accent
                             motorActive: arm.wristMoving
                             z: 3
