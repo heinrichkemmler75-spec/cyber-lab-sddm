@@ -47,6 +47,7 @@ Item {
                 x: arm.pose.monitorX
                 y: arm.pose.monitorY
                 accent: root.accent
+                animationProgress: motion.progress
                 LoginPanel {
                     id: login
                     anchors.fill: parent
