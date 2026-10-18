@@ -5,11 +5,11 @@ Item {
     id: motion
     objectName: "terminalAnimation"
     property bool animationEnabled: false
-    property int duration: 2000
+    property int duration: 3000
     property real progress: 1
     property bool initialized: false
-    // For 2000 ms: base 0-620, lift 570-1180, monitor unfolds 1130-1800,
-    // then settles by 2000 ms. 50 ms overlaps remain between main joints.
+    // For 3000 ms: base 0-930, lift 880-1770, monitor unfolds 1720-2700,
+    // then settles by 3000 ms. 50 ms overlaps remain between main joints.
     // Start the next joint 50 ms before the preceding phase ends, for a
     // small crossfade of motion rather than three isolated stop-and-go steps.
     // Calculate overlap from milliseconds so it stays 50 ms if duration changes.
