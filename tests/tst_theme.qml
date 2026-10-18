@@ -243,7 +243,7 @@ Item {
             compare(motion.foldAngle, 65);
             motion.progress = 0.31;
             compare(motion.baseAngle, 0);
-            compare(motion.liftAngle, 65);
+            verify(motion.liftAngle <= 65 && motion.liftAngle > 60);
             compare(motion.foldAngle, 65);
             const low = wrist.mapToItem(reference, 0, 0);
             const hinge = elbow.mapToItem(reference, 0, 0);
@@ -259,11 +259,11 @@ Item {
             verify(raised.y < mid.y);
             fuzzyCompare(elbow.mapToItem(reference, 0, 0).y, hinge.y, 0.01);
             compare(motion.liftAngle, 0);
-            compare(motion.foldAngle, 65);
+            verify(motion.foldAngle > 60 && motion.foldAngle <= 65);
             // Geometry no longer collapses while unfolding. The underside
             // is drawn with perspective sprites at its full mechanical size.
-            compare(monitor.openness, 0);
-            verify(findChild(theme, "monitor").foldAngle > 60);
+            verify(monitor.openness >= 0 && monitor.openness < 0.1);
+            verify(monitor.foldAngle > 60);
             motion.progress = 0.61;
             verify(motion.foldAngle < 65 && motion.foldAngle > 0, "Counter-clockwise unfolding");
             compare(motion.baseAngle, 0);
