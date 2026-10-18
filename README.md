@@ -2,7 +2,7 @@
 
 Ein modulares Qt6/QML-Anmeldetheme für SDDM mit permanent sichtbarem Laborhintergrund und einer grünen Anmeldeoberfläche auf schwarzem Grund.
 
-**Status: Version 0.2.0 – vermessene Endpose und Drei-Gelenk-Animation.** Der rechteckige Monitor rechts der Bildmitte ist ein Platzhalter. Arm und Monitor werden vorerst mit einfachen QML-Formen dargestellt. Die gelieferten Grafikkandidaten sind ausschließlich Referenzen. Die Drei-Gelenk-Animation endet in der aus dem freigegebenen Vorschaubild vermessenen Pose. Die SDDM-Schnittstellen sind angebunden; eine echte Systemanmeldung wurde noch nicht geprüft.
+**Status: Version 0.3.0 – ruhige, sequenzielle Drei-Gelenk-Animation.** Der rechteckige Monitor rechts der Bildmitte ist ein Platzhalter. Arm und Monitor werden vorerst mit einfachen QML-Formen dargestellt. Die gelieferten Grafikkandidaten sind ausschließlich Referenzen. Die Drei-Gelenk-Animation endet in der aus dem freigegebenen Vorschaubild vermessenen Pose. Die SDDM-Schnittstellen sind angebunden; eine echte Systemanmeldung wurde noch nicht geprüft.
 
 ## Funktionen
 
@@ -48,11 +48,22 @@ scripts/
 tests/tst_theme.qml             Automatisierte Tests mit simuliertem SDDM
 ```
 
-Die Endpose wird in `Components/ReferencePose.js` aus den vermessenen Bildkoordinaten berechnet: **x=930, y=320, Breite=404, Höhe=292** bei 1672×941. Normiert: **(0,556220; 0,340064; 0,241627; 0,310308)**, frontal mit 0° Roll/Yaw/Pitch. Hintergrund und Gelenkkette verwenden denselben Maßstab und denselben mittigen Bildbeschnitt. Die Animation verändert nur Winkel-Offsets; alle Offsets enden exakt bei null.
+Die Endpose wird in `Components/ReferencePose.js` aus den vermessenen Bildkoordinaten berechnet: **x=930, y=320, Breite=404, Höhe=292** bei 1672×941. Normiert: **(0,556220; 0,340064; 0,241627; 0,310308)**, frontal mit 0° Roll/Yaw/Pitch. Hintergrund und Gelenkkette verwenden denselben Maßstab und denselben mittigen Bildbeschnitt. Die Animation verändert ausschließlich die vorgeschalteten Gelenkprojektionen; in der Endpose sind diese neutral.
 
 Die [Messdokumentation](docs/reference-pose.md) enthält Bezugspunkte, Messunsicherheiten, Formeln und ein [Overlay](docs/reference-pose.svg). Der angeschnittene Basis-Drehpunkt ist nur näherungsweise rekonstruierbar; die Monitor-Endpose ist davon unabhängig festgelegt.
 
-`TerminalMonitor` nimmt beliebige QML-Inhalte auf. `LoginPanel` erhält Backend und Modelle als Eigenschaften und hängt nicht von der Armbewegung ab. Seine kompakte Oberfläche passt in die ebenfalls vermessene Displayöffnung. Die drei verschachtelten Gelenke übertragen ihre Drehung jeweils auf alle nachfolgenden Teile. `TerminalAnimation` liefert Winkel und Fortschritt sowie `running` und `ready`; das Monitoraufklappen wird zusätzlich perspektivisch dargestellt. Ein-/Ausschalten, Dauer 0 und Größenänderungen führen zur gleichen Zielpose.
+`TerminalMonitor` nimmt beliebige QML-Inhalte auf. `LoginPanel` erhält Backend und Modelle als Eigenschaften und hängt nicht von der Armbewegung ab. Seine kompakte Oberfläche passt in die ebenfalls vermessene Displayöffnung. Die drei verschachtelten Gelenke übertragen ihre jeweilige Projektion auf alle nachfolgenden Teile. `TerminalAnimation` liefert Winkel und Fortschritt sowie `running` und `ready`; das Monitoraufklappen wird zusätzlich perspektivisch dargestellt. Ein-/Ausschalten, Dauer 0 und Größenänderungen führen zur gleichen Zielpose.
+
+Die Standardbewegung dauert **2000 ms**. Jede Phase verwendet lokal **InOutCubic** mit weichem Anfahren und Abbremsen:
+
+| Zeit | Bewegung |
+| --- | --- |
+| 0–620 ms | Gelenk 1 schwenkt im Uhrzeigersinn von rechts unten herein, projiziert in der x-y-Ebene. |
+| 620–1100 ms | Gelenk 2 hebt den noch flachen Monitor von unten nach oben. Die y-z-Projektion hält die horizontale Handgelenkposition fest. |
+| 1100–1340 ms | Gelenk 3 dreht gegen den Uhrzeigersinn in der x-z-Darstellung; die flache Monitorfläche richtet sich frontal auf. |
+| 1340–2000 ms | Eine einmalige Nachbewegung von höchstens 0,6°, bis 1800 ms abgeklungen; anschließend ruhige Endstellung. |
+
+Die Bewegungen überlappen nicht. Eine andere konfigurierte Gesamtdauer skaliert alle Phasen proportional. Die Darstellung nutzt einfache QML-Formen; die SDDM-Eingabekomponenten bleiben dieselben. [Gerenderte 2-Sekunden-Vorschau](docs/animation-preview.mp4).
 
 Die gelieferten Kandidatengrafiken und Konzepttafeln liegen unverändert unter `docs/image-package/`. Sie werden weder geladen noch installiert; es wurden keine neuen endgültigen Grafiken erzeugt.
 
@@ -76,7 +87,7 @@ Die Schnittstellen wurden mit den installierten Themes und dem [SDDM-0.21-Quellt
 ```ini
 [General]
 AnimationEnabled=true
-AnimationDuration=800
+AnimationDuration=2000
 GreenColor=#66ff99
 ShowUserPicture=true
 ```
@@ -84,7 +95,7 @@ ShowUserPicture=true
 | Einstellung | Bedeutung |
 | --- | --- |
 | `AnimationEnabled` | `true`: Drei-Gelenk-Einschwenken; `false`: sofort die vermessene Endpose. |
-| `AnimationDuration` | Gesamtdauer in Millisekunden, Vorgabe 800; `0` zeigt sofort die Endpose. |
+| `AnimationDuration` | Gesamtdauer in Millisekunden, Vorgabe 2000; `0` zeigt sofort die Endpose. |
 | `GreenColor` | Qt-Farbwert für Schrift, Bedienelemente und Rahmen. Für gute Lesbarkeit einen hellen Grünton verwenden. |
 | `ShowUserPicture` | `true` zeigt Profilbereich und Ersatzanzeige, `false` blendet den Profilbereich aus. Die Benutzerwahl bleibt verfügbar. |
 
@@ -117,10 +128,10 @@ Die Tests verwenden ein simuliertes Backend und ausschließlich erfundene Zugang
 ### Tatsächlich durchgeführt
 
 - `qmllint` für `Main.qml` und alle Komponenten: ohne Warnungen. Die vier von SDDM eingespeisten Kontextvariablen sind gezielt von der statischen Prüfung unqualifizierter Zugriffe ausgenommen und werden im echten Greeter geladen.
-- Qt-Tests: **15 bestanden, 0 fehlgeschlagen** einschließlich Initialisierung und Aufräumen.
+- Qt-Tests: **18 bestanden, 0 fehlgeschlagen** einschließlich Initialisierung und Aufräumen.
 - Geprüft: Enter und Anmeldeschaltfläche, übergebene Zugangsdaten/Sitzung, Schutz vor doppelter Anmeldung, Fehleranzeige, geleertes Passwort und wiederhergestellter Fokus, Benutzer-/Sitzungswechsel, Profilbild und Ersatzanzeige, Systemaktionsaufrufe und deren Verfügbarkeit, leere Modelle.
 - Geprüft: Fokusfolge und automatisches Scrollen bei 640×480; Layout bei **640×480, 800×600, 1280×720, 1672×941 und 1920×1080**; Hintergrund bleibt geladen und sichtbar; Endpose stimmt mit den Referenzkoordinaten überein; Profilbereich lässt sich ausblenden.
-- Gerenderte Endpose und Zwischenphasen visuell kontrolliert. Numerisch geprüft: konstante Segmentlängen, Bewegung aller drei Gelenke, exakte Endpose nach 800 ms, Ausschalten während der Bewegung, Dauer 0 und Größenänderung während der Bewegung.
+- Gerenderte Endpose und Zwischenphasen visuell kontrolliert. Numerisch geprüft: Segmentlänge im räumlichen Liftmodell, Phasenreihenfolge und Drehrichtung, Anheben ohne seitliche Drift des Handgelenks, Eintritt von rechts statt von oben, weiche Phasengrenzen ohne Positionssprünge, kein perspektivisches Übervergrößern, exakte Endpose nach 2000 ms, Ausschalten während der Bewegung, Dauer 0 und Größenänderung während der Bewegung.
 - Echter SDDM-Greeter im Testmodus: Theme geladen, kein Rückfall auf das eingebettete Theme, keine QML-Lade-, Bindungs- oder Importfehler.
 - Shell-Skripte mit `bash -n` geprüft.
 
@@ -141,7 +152,7 @@ Die spätere Aktivierung erfolgt bewusst manuell, beispielsweise über die KDE-S
 
 ## Bekannte Einschränkungen und nächste Schritte
 
-- QML-Platzhalter mit Animation; endgültige Arm- und Monitorgrafiken fehlen absichtlich. Die Gelenke sind eine planare Rekonstruktion mit perspektivischem Monitoraufklappen; aus einem einzelnen Bild ist keine eindeutige 3D-Mechanik ableitbar.
+- QML-Platzhalter mit Animation; endgültige Arm- und Monitorgrafiken fehlen absichtlich. Die Gelenke verwenden eine projizierte x-y-Drehung, ein y-z-Liftmodell und eine x-z-Aufklappsimulation; aus einem einzelnen Bild ist keine eindeutige 3D-Mechanik ableitbar.
 - Standardanmeldung mit Benutzername und Passwort. Zusätzliche PAM-Dialoge wie Passwortwechsel oder mehrstufige Abfragen sind nicht implementiert.
 - Es werden die von SDDM angebotenen Benutzer verwendet; keine freie Eingabe versteckter Konten.
 - Deutsche Oberflächentexte; keine zusätzliche Sprachauswahl, Tastaturbelegungsauswahl oder Bildschirmtastatur.

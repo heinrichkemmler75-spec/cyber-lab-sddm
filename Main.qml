@@ -19,7 +19,7 @@ Item {
     readonly property bool showAvatar: String(root.themeConfig.ShowUserPicture).toLowerCase() !== "false"
     readonly property bool animationEnabled: String(root.themeConfig.AnimationEnabled).toLowerCase() === "true"
     readonly property int animationDuration: isFinite(Number(root.themeConfig.AnimationDuration))
-        ? Math.max(0, Number(root.themeConfig.AnimationDuration)) : 800
+        ? Math.max(0, Number(root.themeConfig.AnimationDuration)) : 2000
     readonly property real sceneScale: Math.max(width / ReferencePose.imageWidth, height / ReferencePose.imageHeight)
 
     BackgroundScene { objectName: "background"; anchors.fill: parent }
@@ -36,9 +36,10 @@ Item {
 
         SwingArm {
             id: arm
-            shoulderAngle: motion.shoulderAngle
-            elbowAngle: motion.elbowAngle
-            wristAngle: motion.wristAngle
+            baseAngle: motion.baseAngle
+            liftAngle: motion.liftAngle
+            foldAngle: motion.foldAngle
+            faceHeightScale: motion.faceHeightScale
             accent: root.accent
             TerminalMonitor {
                 id: monitor
@@ -46,7 +47,6 @@ Item {
                 x: arm.pose.monitorX
                 y: arm.pose.monitorY
                 accent: root.accent
-                yaw: motion.yaw
                 LoginPanel {
                     id: login
                     anchors.fill: parent

@@ -32,17 +32,16 @@ function geometry() {
     };
 }
 
-// Motion offsets only. Every track ends at zero, so the measured pose wins.
-function track(t, values) {
-    var times = [0, 0.55, 0.8375, 1];
-    if (t <= 0) return values[0];
-    if (t >= 1) return values[3];
-    for (var i = 1; i < times.length; i++) {
-        if (t <= times[i]) {
-            var u = (t - times[i - 1]) / (times[i] - times[i - 1]);
-            u = u * u * (3 - 2 * u);
-            return values[i - 1] + (values[i] - values[i - 1]) * u;
-        }
-    }
-    return 0;
+// Each phase owns one degree of freedom. The clock stays linear; the local
+// phase interpolation is InOutCubic, with zero velocity at both boundaries.
+function phase(t, start, end) {
+    var u = Math.max(0, Math.min(1, (t - start) / (end - start)));
+    return u < 0.5 ? 4 * u * u * u : 1 - Math.pow(-2 * u + 2, 3) / 2;
+}
+
+function latch(t) {
+    // A single sub-degree excursion, then rest. No perpetual spring/oscillation.
+    if (t <= 0.67 || t >= 0.90) return 0;
+    if (t < 0.77) return 0.6 * phase(t, 0.67, 0.77);
+    return 0.6 * (1 - phase(t, 0.77, 0.90));
 }

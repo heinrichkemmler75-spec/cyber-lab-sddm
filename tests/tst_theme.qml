@@ -5,7 +5,7 @@ import ".."
 Item {
     width: 1920
     height: 1080
-    property var config: ({GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "false", AnimationDuration: "800"})
+    property var config: ({GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "false", AnimationDuration: "2000"})
     QtObject {
         id: sddm
         property bool canReboot: true
@@ -48,7 +48,7 @@ Item {
         property var panel
         property var password
         function init() {
-            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "false", AnimationDuration: "800"};
+            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "false", AnimationDuration: "2000"};
             sddm.canReboot = true;
             sddm.canPowerOff = true;
             sddm.loginCalls = 0;
@@ -169,7 +169,7 @@ Item {
             fuzzyCompare(topRight.y, topLeft.y, 0.01);
             fuzzyCompare(bottomRight.y - topRight.y, 292 * scale, 0.01);
             fuzzyCompare(bottomRight.x, topRight.x, 0.01);
-            compare(monitor.yaw, 0);
+            compare(findChild(theme, "terminalAnimation").foldAngle, 0);
             const reference = findChild(theme, "referenceScene");
             const wrist = findChild(theme, "wristJoint").mapToItem(reference, 0, 0);
             fuzzyCompare(wrist.x, 1404, 0.01);
@@ -177,20 +177,20 @@ Item {
         }
         function test_animationCompletesExactly() {
             const motion = findChild(theme, "terminalAnimation");
-            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "true", AnimationDuration: "800"};
+            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "true", AnimationDuration: "2000"};
             verify(motion.running);
             wait(120);
             verify(motion.progress > 0 && motion.progress < 1);
             // Resize during the animation: geometry uses the current background transform.
             theme.width = 1672;
             theme.height = 941;
-            tryCompare(motion, "running", false, 1200);
+            tryCompare(motion, "running", false, 2600);
             compare(motion.progress, 1);
             checkMeasuredPose();
             verify(password.activeFocus);
             motion.restart();
             wait(80);
-            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "false", AnimationDuration: "800"};
+            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "false", AnimationDuration: "2000"};
             verify(!motion.running);
             checkMeasuredPose();
             test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "true", AnimationEnabled: "true", AnimationDuration: "0"};
@@ -201,30 +201,124 @@ Item {
             theme.width = 1672;
             theme.height = 941;
             const motion = findChild(theme, "terminalAnimation");
+            const arm = findChild(theme, "swingArm");
             const reference = findChild(theme, "referenceScene");
             const shoulder = findChild(theme, "shoulderJoint");
             const elbow = findChild(theme, "elbowJoint");
             const wrist = findChild(theme, "wristJoint");
-            const poses = [0, 0.275, 0.55, 0.8375, 1];
+            const monitor = findChild(theme, "monitor");
+            const poses = [0, 0.155, 0.31, 0.43, 0.55, 0.61, 0.67, 0.77, 0.9, 1];
             for (let i = 0; i < poses.length; ++i) {
                 motion.progress = poses[i];
                 wait(20);
                 const a = shoulder.mapToItem(reference, 0, 0);
-                const b = elbow.mapToItem(reference, 0, 0);
-                const c = wrist.mapToItem(reference, 0, 0);
-                fuzzyCompare(Math.hypot(b.x - a.x, b.y - a.y), Math.hypot(72, 157), 0.01);
-                fuzzyCompare(Math.hypot(c.x - b.x, c.y - b.y), Math.hypot(198, 48), 0.01);
+                fuzzyCompare(a.x, 1674, 0.01);
+                fuzzyCompare(a.y, 658, 0.01);
+                // Upper-link length is invariant in its model Y-Z space,
+                // not in a foreshortened 2D projection.
+                fuzzyCompare(Math.hypot(arm.upperX, elbow.projectedY, elbow.projectedZ),
+                             Math.hypot(198, 48, 210), 0.01);
+                compare(wrist.x, -198);
+                compare(elbow.rotation, 0);
+                compare(wrist.rotation, 0);
                 compare(findChild(theme, "background").opacity, 1);
                 verify(findChild(theme, "background").visible);
                 grabImage(theme).save("/tmp/cyber-lab-motion-" + i + ".png");
             }
             checkMeasuredPose();
-            // All three physical joints change angle during the entrance.
-            const finalAngles = [shoulder.rotation, elbow.rotation, wrist.rotation];
+        }
+        function test_phaseOrderAndDirection() {
+            const motion = findChild(theme, "terminalAnimation");
+            const reference = findChild(theme, "referenceScene");
+            const elbow = findChild(theme, "elbowJoint");
+            const wrist = findChild(theme, "wristJoint");
+            const monitor = findChild(theme, "monitor");
             motion.progress = 0;
-            verify(Math.abs(shoulder.rotation - finalAngles[0]) > 1);
-            verify(Math.abs(elbow.rotation - finalAngles[1]) > 1);
-            verify(Math.abs(wrist.rotation - finalAngles[2]) > 1);
+            const startAngle = motion.baseAngle;
+            const startWrist = wrist.mapToItem(reference, 0, 0);
+            verify(startWrist.x > 1672, "Starts beyond the right edge");
+            motion.progress = 0.155;
+            verify(motion.baseAngle > startAngle, "Clockwise base rotation");
+            compare(motion.liftAngle, 65);
+            compare(motion.foldAngle, 65);
+            motion.progress = 0.31;
+            compare(motion.baseAngle, 0);
+            compare(motion.liftAngle, 65);
+            compare(motion.foldAngle, 65);
+            const low = wrist.mapToItem(reference, 0, 0);
+            const hinge = elbow.mapToItem(reference, 0, 0);
+            motion.progress = 0.43;
+            const mid = wrist.mapToItem(reference, 0, 0);
+            fuzzyCompare(mid.x, low.x, 0.01);
+            verify(mid.y < low.y, "Joint 2 lifts, with no sideways sweep");
+            compare(motion.baseAngle, 0);
+            compare(motion.foldAngle, 65);
+            motion.progress = 0.55;
+            const raised = wrist.mapToItem(reference, 0, 0);
+            fuzzyCompare(raised.x, low.x, 0.01);
+            verify(raised.y < mid.y);
+            fuzzyCompare(elbow.mapToItem(reference, 0, 0).y, hinge.y, 0.01);
+            compare(motion.liftAngle, 0);
+            compare(motion.foldAngle, 65);
+            const flatTop = monitor.mapToItem(reference, monitor.width, 0);
+            const flatBottom = monitor.mapToItem(reference, monitor.width, monitor.height);
+            verify(Math.abs(flatBottom.y - flatTop.y) < 60, "Folded monitor is a horizontal plate");
+            motion.progress = 0.61;
+            verify(motion.foldAngle < 65 && motion.foldAngle > 0, "Counter-clockwise unfolding");
+            compare(motion.baseAngle, 0);
+            compare(motion.liftAngle, 0);
+            fuzzyCompare(wrist.mapToItem(reference, 0, 0).y, raised.y, 0.01);
+            motion.progress = 0.67;
+            checkMeasuredPose();
+            motion.progress = 0.77;
+            verify(Math.abs(motion.foldAngle) <= 0.6);
+            verify(Math.abs(motion.foldAngle) > 0);
+            compare(motion.baseAngle, 0);
+            compare(motion.liftAngle, 0);
+            motion.progress = 0.90;
+            checkMeasuredPose();
+            motion.progress = 1;
+            checkMeasuredPose();
+        }
+        function test_noTopEntrance() {
+            const motion = findChild(theme, "terminalAnimation");
+            const reference = findChild(theme, "referenceScene");
+            const monitor = findChild(theme, "monitor");
+            let previousX = Infinity;
+            for (let i = 0; i <= 31; ++i) {
+                motion.progress = i / 100;
+                const center = monitor.mapToItem(reference, monitor.width / 2, monitor.height / 2);
+                verify(center.x <= previousX + 0.01, "Entrance moves right to left");
+                previousX = center.x;
+                const corners = [monitor.mapToItem(reference, 0, 0),
+                    monitor.mapToItem(reference, monitor.width, 0),
+                    monitor.mapToItem(reference, 0, monitor.height),
+                    monitor.mapToItem(reference, monitor.width, monitor.height)];
+                for (const corner of corners)
+                    verify(corner.y > 450, "No monitor entry from above");
+            }
+            motion.progress = 1;
+        }
+        function test_smoothBoundariesAndUnfolding() {
+            const motion = findChild(theme, "terminalAnimation");
+            const monitor = findChild(theme, "monitor");
+            const reference = findChild(theme, "referenceScene");
+            for (const boundary of [0.31, 0.55, 0.67, 0.77, 0.90]) {
+                motion.progress = boundary - 0.0001;
+                const before = monitor.mapToItem(reference, 0, 0);
+                motion.progress = boundary + 0.0001;
+                const after = monitor.mapToItem(reference, 0, 0);
+                verify(Math.hypot(after.x - before.x, after.y - before.y) < 0.1,
+                       "No visible position jump at a phase boundary");
+            }
+            for (let i = 0; i <= 24; ++i) {
+                motion.progress = 0.55 + 0.12 * i / 24;
+                const left = monitor.mapToItem(reference, 0, 0);
+                const right = monitor.mapToItem(reference, monitor.width, 0);
+                verify(right.x - left.x <= 404.01, "No perspective ballooning past final width: " + (right.x - left.x) + " at " + motion.progress);
+            }
+            motion.progress = 1;
+            checkMeasuredPose();
         }
         function test_sizes_data() {
             return [ {tag:"1672x941", w:1672, h:941}, {tag:"640x480", w:640, h:480}, {tag:"800x600", w:800, h:600},
@@ -239,7 +333,7 @@ Item {
             const background = findChild(theme, "background");
             compare(background.status, Image.Ready);
             verify(background.visible && background.opacity === 1);
-            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "false", AnimationEnabled: "false", AnimationDuration: "800"};
+            test.parent.config = {GreenColor: "#66ff99", ShowUserPicture: "false", AnimationEnabled: "false", AnimationDuration: "2000"};
             wait(20);
             checkMeasuredPose();
             verify(!findChild(theme, "userProfile").visible);
