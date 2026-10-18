@@ -2,7 +2,7 @@
 
 Ein modulares Qt6/QML-Anmeldetheme für SDDM mit permanent sichtbarem Laborhintergrund und einer grünen Anmeldeoberfläche auf schwarzem Grund.
 
-**Status: Version 0.3.0 – ruhige, sequenzielle Drei-Gelenk-Animation.** Der rechteckige Monitor rechts der Bildmitte ist ein Platzhalter. Arm und Monitor werden vorerst mit einfachen QML-Formen dargestellt. Die gelieferten Grafikkandidaten sind ausschließlich Referenzen. Die Drei-Gelenk-Animation endet in der aus dem freigegebenen Vorschaubild vermessenen Pose. Die SDDM-Schnittstellen sind angebunden; eine echte Systemanmeldung wurde noch nicht geprüft.
+**Status: erste PNG-Integration auf Grundlage der bestehenden Drei-Gelenk-Animation.** Die Bauteilgrafiken unter `Assets/arm/` und der Monitorrahmen unter `Assets/terminal/` werden nun direkt in QML angezeigt. LED-Ringsegmente können während der Gelenkbewegung umlaufen. Die bestehenden Gelenkachsen und die aus dem Vorschaubild vermessene Endpose bleiben unverändert; der Ablauf dauert weiterhin 2.000 ms mit 50 ms Überlappung zwischen den Gelenkphasen. **Die mechanischen Übergänge, die Größenwirkung und die Perspektive der Einzelgrafiken müssen noch am echten Greeter visuell geprüft werden.** Die SDDM-Schnittstellen sind angebunden; eine echte Systemanmeldung wurde noch nicht geprüft.
 
 ## Funktionen
 
@@ -164,3 +164,16 @@ Die spätere Aktivierung erfolgt bewusst manuell, beispielsweise über die KDE-S
 Das folgende freigegebene Vorschaubild zeigt die **spätere grafische Gestaltung mit mechanischem Arm**. Die Einzelgrafiken sind noch nicht produktionsfertig. Die Metadaten verwenden dieses vorhandene Vorschaubild. Der aktuelle Monitor besteht ausschließlich aus einfachen QML-Rechtecken.
 
 ![Gestalterisches Zielbild mit Arm und Terminal](Assets/previews/final_terminal_preview.png)
+
+
+## PNG-Integration (aktueller Entwicklungsstand)
+
+Die erste visuelle Integration lädt direkt folgende hochgeladene Bauteile:
+
+- `Assets/arm/base.png`, `base_joint.png`, `lower_link.png`, `elbow_joint.png`, `upper_link.png`, `monitor_mount.png`
+- `Assets/terminal/monitor_frame.png` als Rahmen mit transparenter Bildschirmöffnung
+- `Assets/leds/ring_segment_overlay.png` zur Animation der Gelenklicht-Segmente
+
+Die Quell-PNGs werden **nicht verändert**. Vorhandene Anschlüsse und Proportionen werden zunächst auf die vermessene Referenzgeometrie abgebildet. Die aus Einzelbildern abgeleiteten Monitorwinkel unter `Assets/terminal/poses/` sind noch nicht aktiv, weil ein direktes Umschalten zwischen ihnen ohne Abgleich der Drehachsen zu sichtbaren Sprüngen führen kann. Die bisherige QML-Transformation bleibt für die dritte Gelenkphase aktiv.
+
+**Prüfung nach Pull:** `./scripts/check.sh` und `./scripts/test.sh` starten, besonders auf Gelenkversatz, Bildüberlagerungen sowie die Lesbarkeit und Bedienbarkeit der Anmeldemaske achten. Der Quellcode wurde aktualisiert; ein lokaler Qt-/SDDM-Lauf auf dem Zielsystem ist damit nicht ersetzt.
