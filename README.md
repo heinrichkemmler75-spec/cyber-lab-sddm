@@ -177,3 +177,12 @@ Die erste visuelle Integration lädt direkt folgende hochgeladene Bauteile:
 Die Quell-PNGs werden **nicht verändert**. Vorhandene Anschlüsse und Proportionen werden zunächst auf die vermessene Referenzgeometrie abgebildet. Die aus Einzelbildern abgeleiteten Monitorwinkel unter `Assets/terminal/poses/` sind noch nicht aktiv, weil ein direktes Umschalten zwischen ihnen ohne Abgleich der Drehachsen zu sichtbaren Sprüngen führen kann. Die bisherige QML-Transformation bleibt für die dritte Gelenkphase aktiv.
 
 **Prüfung nach Pull:** `./scripts/check.sh` und `./scripts/test.sh` starten, besonders auf Gelenkversatz, Bildüberlagerungen sowie die Lesbarkeit und Bedienbarkeit der Anmeldemaske achten. Der Quellcode wurde aktualisiert; ein lokaler Qt-/SDDM-Lauf auf dem Zielsystem ist damit nicht ersetzt.
+
+
+## Aktuelle Überarbeitung: Klappmonitor, Kompaktlayout und Kabel
+
+- Das Monitorgelenk blendet während der dritten Phase zwischen den unter `Assets/terminal/poses/` vorhandenen Ansichten über. Der komplette Monitor und die Eingabefelder werden nicht mehr künstlich von klein nach groß skaliert. Die verwendeten Bilder sind perspektivisch aus der Frontansicht abgeleitet: Eine physikalisch echte Unterseitenansicht ist damit **noch nicht** nachgewiesen.
+- Die Anmeldeoberfläche nutzt kleinere Abstände und ein kompakteres Profilbild; Neustart und Herunterfahren sitzen als Symbolbuttons rechts unten. Die gemessene äußere Monitor-Endpose bleibt gleich.
+- Der Unterarm verwendet eine Kabelgrafik; am Oberarm folgt eine gezeichnete Kabelschlaufe der Gelenkprojektion. Das mittlere Gelenk und die Monitorhalterung verwenden unterschiedliche Grafiken.
+- Gesamtdauer und 50-ms-Phasenüberlappung unverändert: **2000 ms**.
+- Änderungen wurden im Repository gespeichert, sind jedoch noch **nicht auf dem Zielgerät visuell getestet**. Vor produktiver Aktivierung `./scripts/check.sh` und `./scripts/test.sh` ausführen; Kabelanschlüsse, Bildperspektiven und Tastaturbedienung prüfen.
