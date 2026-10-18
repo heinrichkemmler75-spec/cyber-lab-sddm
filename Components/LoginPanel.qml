@@ -45,7 +45,10 @@ FocusScope {
         id: scroll
         objectName: "formScroll"
         anchors.fill: parent
-        anchors.margins: 5
+        anchors.leftMargin: 14
+        anchors.rightMargin: 14
+        anchors.topMargin: 15
+        anchors.bottomMargin: 9
         contentWidth: width
         contentHeight: form.implicitHeight
         clip: true
@@ -77,8 +80,8 @@ FocusScope {
                 spacing: 6
                 UserProfile {
                     objectName: "userProfile"
-                    Layout.preferredWidth: 45
-                    Layout.preferredHeight: 45
+                    Layout.preferredWidth: 62
+                    Layout.preferredHeight: 62
                     visible: panel.showAvatar
                     showName: false
                     users: panel.users
@@ -140,11 +143,6 @@ FocusScope {
             }
             RowLayout {
                 Layout.fillWidth: true
-                Text {
-                    text: "Sitzung"
-                    color: panel.accent
-                    font.pixelSize: 12
-                }
                 SessionSelector {
                     id: sessionChoice
                     objectName: "sessionChoice"
