@@ -260,9 +260,10 @@ Item {
             fuzzyCompare(elbow.mapToItem(reference, 0, 0).y, hinge.y, 0.01);
             compare(motion.liftAngle, 0);
             compare(motion.foldAngle, 65);
-            const flatTop = monitor.mapToItem(reference, monitor.width, 0);
-            const flatBottom = monitor.mapToItem(reference, monitor.width, monitor.height);
-            verify(Math.abs(flatBottom.y - flatTop.y) < 60, "Folded monitor is a horizontal plate");
+            // Geometry no longer collapses while unfolding. The underside
+            // is drawn with perspective sprites at its full mechanical size.
+            compare(monitor.openness, 0);
+            verify(findChild(theme, "monitor").foldAngle > 60);
             motion.progress = 0.61;
             verify(motion.foldAngle < 65 && motion.foldAngle > 0, "Counter-clockwise unfolding");
             compare(motion.baseAngle, 0);
