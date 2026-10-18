@@ -19,7 +19,7 @@ Item {
     readonly property bool showAvatar: String(root.themeConfig.ShowUserPicture).toLowerCase() !== "false"
     readonly property bool animationEnabled: String(root.themeConfig.AnimationEnabled).toLowerCase() === "true"
     readonly property int animationDuration: isFinite(Number(root.themeConfig.AnimationDuration))
-        ? Math.max(0, Number(root.themeConfig.AnimationDuration)) : 2000
+        ? Math.max(0, Number(root.themeConfig.AnimationDuration)) : 3000
     readonly property real sceneScale: Math.max(width / ReferencePose.imageWidth, height / ReferencePose.imageHeight)
 
     BackgroundScene { objectName: "background"; anchors.fill: parent }
