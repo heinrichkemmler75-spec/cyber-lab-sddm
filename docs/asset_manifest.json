@@ -1,0 +1,161 @@
+{
+  "Assets/arm/base.png": {
+    "source": "futuristische_roboterbasis_mit_hazard_streifen.png",
+    "pixels": [
+      1440,
+      1077
+    ],
+    "alpha": true
+  },
+  "Assets/arm/lower_link.png": {
+    "source": "industrielles_roboterarm_segment_mit_kabeln.png",
+    "pixels": [
+      2089,
+      701
+    ],
+    "alpha": true
+  },
+  "Assets/arm/upper_link.png": {
+    "source": "industrielles_sci_fi_roboterarm_segment.png",
+    "pixels": [
+      1516,
+      1003
+    ],
+    "alpha": true
+  },
+  "Assets/arm/elbow_joint.png": {
+    "source": "futuristischer_robotergelenk_mit_neonringen.png",
+    "pixels": [
+      1246,
+      1249
+    ],
+    "alpha": true
+  },
+  "Assets/arm/base_joint.png": {
+    "source": "futuristisches_roboter_gelenk_mit_neonlicht.png",
+    "pixels": [
+      1209,
+      1206
+    ],
+    "alpha": true
+  },
+  "Assets/arm/monitor_mount.png": {
+    "source": "futuristische_industrieroboter_gelenkhalterung.png",
+    "pixels": [
+      1076,
+      1431
+    ],
+    "alpha": true
+  },
+  "Assets/arm/cable_bundle.png": {
+    "source": "industrielles_sci_fi_kabelbündel.png",
+    "pixels": [
+      1672,
+      898
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/monitor_frame.png": {
+    "source": "futuristischer_industrie_hud_rahmen.png",
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/leds/status_bar_reference.png": {
+    "source": "futuristische_led_statusleiste_in_grün.png",
+    "pixels": [
+      2115,
+      595
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_00deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 0,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_15deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 15,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_30deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 30,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_45deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 45,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_60deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 60,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_75deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 75,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/terminal/poses/monitor_90deg.png": {
+    "source": "monitor_frame.png (projection)",
+    "angle_degrees_from_horizontal": 90,
+    "pixels": [
+      1448,
+      1071
+    ],
+    "alpha": true
+  },
+  "Assets/leds/ring_segment_overlay.png": {
+    "generated": "transparent LED circle",
+    "pixels": [
+      512,
+      512
+    ],
+    "alpha": true
+  },
+  "Assets/leds/ring_base_overlay.png": {
+    "generated": "transparent LED circle",
+    "pixels": [
+      512,
+      512
+    ],
+    "alpha": true
+  },
+  "Assets/leds/bar_segments.png": {
+    "generated": "16 static bars, animate using QML masks/opacity",
+    "pixels": [
+      640,
+      76
+    ],
+    "alpha": true
+  }
+}
