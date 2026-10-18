@@ -16,9 +16,12 @@ FocusScope {
     readonly property int selectedSession: sessionChoice.currentIndex
     readonly property bool canLogin: selectedUser.length > 0 && selectedSession >= 0 && !busy
 
-    function focusPassword() { password.forceActiveFocus(); }
+    function focusPassword() {
+        password.forceActiveFocus();
+    }
     function submit() {
-        if (!canLogin) return;
+        if (!canLogin)
+            return;
         errorMessage = "";
         busy = true;
         backend.login(selectedUser, password.text, selectedSession);
@@ -33,23 +36,26 @@ FocusScope {
             password.clear();
             panel.focusPassword();
         }
-        function onLoginSucceeded() { password.clear(); }
+        function onLoginSucceeded() {
+            password.clear();
+        }
     }
 
     Flickable {
         id: scroll
         objectName: "formScroll"
         anchors.fill: parent
-        anchors.margins: 18
+        anchors.margins: 8
         contentWidth: width
         contentHeight: form.implicitHeight
         clip: true
         boundsBehavior: Flickable.StopAtBounds
-        ScrollBar.vertical: ScrollBar { }
+        ScrollBar.vertical: ScrollBar {}
 
         function reveal(item) {
             const pos = item.mapToItem(form, 0, 0);
-            if (pos.y < contentY) contentY = pos.y;
+            if (pos.y < contentY)
+                contentY = pos.y;
             else if (pos.y + item.height > contentY + height)
                 contentY = Math.min(contentHeight - height, pos.y + item.height - height);
         }
@@ -57,82 +63,98 @@ FocusScope {
         ColumnLayout {
             id: form
             width: scroll.width
-            spacing: 10
+            spacing: 5
             Text {
                 text: "CYBER LAB / ZUGANG"
                 color: panel.accent
-                font.pixelSize: 19
+                font.pixelSize: 12
                 font.bold: true
                 Layout.fillWidth: true
                 elide: Text.ElideRight
             }
-            Text {
-                text: "Benutzer"
-                color: panel.accent
-                font.pixelSize: 14
-            }
-            GreenComboBox {
-                id: userChoice
-                objectName: "userChoice"
+            RowLayout {
                 Layout.fillWidth: true
-                accent: panel.accent
-                model: panel.users
-                enabled: !panel.busy && count > 0
-                Accessible.name: "Benutzer"
-                onActiveFocusChanged: if (activeFocus) scroll.reveal(this)
-                onActivated: {
-                    password.clear();
-                    panel.errorMessage = "";
-                    panel.focusPassword();
+                spacing: 8
+                UserProfile {
+                    objectName: "userProfile"
+                    Layout.preferredWidth: 56
+                    Layout.preferredHeight: 56
+                    visible: panel.showAvatar
+                    showName: false
+                    users: panel.users
+                    selectedIndex: userChoice.currentIndex
+                    userName: panel.selectedUser
+                    accent: panel.accent
                 }
-                Component.onCompleted: {
-                    const last = panel.users ? panel.users.lastIndex : -1;
-                    currentIndex = count > 0 ? Math.max(0, Math.min(last, count - 1)) : -1;
+                ColumnLayout {
+                    Layout.fillWidth: true
+                    spacing: 4
+                    GreenComboBox {
+                        id: userChoice
+                        objectName: "userChoice"
+                        Layout.fillWidth: true
+                        accent: panel.accent
+                        model: panel.users
+                        enabled: !panel.busy && count > 0
+                        Accessible.name: "Benutzer"
+                        onActiveFocusChanged: if (activeFocus)
+                            scroll.reveal(this)
+                        onActivated: {
+                            password.clear();
+                            panel.errorMessage = "";
+                            panel.focusPassword();
+                        }
+                        Component.onCompleted: {
+                            const last = panel.users ? panel.users.lastIndex : -1;
+                            currentIndex = count > 0 ? Math.max(0, Math.min(last, count - 1)) : -1;
+                        }
+                    }
+                    TextField {
+                        id: password
+                        objectName: "passwordField"
+                        Layout.fillWidth: true
+                        implicitHeight: 26
+                        color: panel.accent
+                        font.pixelSize: 13
+                        placeholderText: "Passwort"
+                        placeholderTextColor: panel.accent
+                        echoMode: TextInput.Password
+                        passwordMaskDelay: 0
+                        enabled: !panel.busy
+                        focus: true
+                        selectByMouse: true
+                        selectionColor: "#184a2c"
+                        selectedTextColor: panel.accent
+                        Accessible.name: "Passwort"
+                        inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
+                        onAccepted: panel.submit()
+                        onActiveFocusChanged: if (activeFocus)
+                            scroll.reveal(this)
+                        background: Rectangle {
+                            color: "#000000"
+                            border.color: panel.accent
+                            border.width: password.activeFocus ? 3 : 1
+                        }
+                    }
                 }
             }
-            UserProfile {
-                objectName: "userProfile"
+            RowLayout {
                 Layout.fillWidth: true
-                visible: panel.showAvatar
-                users: panel.users
-                selectedIndex: userChoice.currentIndex
-                userName: panel.selectedUser
-                accent: panel.accent
-            }
-            Text { text: "Passwort"; color: panel.accent; font.pixelSize: 14 }
-            TextField {
-                id: password
-                objectName: "passwordField"
-                Layout.fillWidth: true
-                implicitHeight: 42
-                color: panel.accent
-                font.pixelSize: 18
-                echoMode: TextInput.Password
-                passwordMaskDelay: 0
-                enabled: !panel.busy
-                focus: true
-                selectByMouse: true
-                selectionColor: "#184a2c"
-                selectedTextColor: panel.accent
-                Accessible.name: "Passwort"
-                inputMethodHints: Qt.ImhHiddenText | Qt.ImhSensitiveData | Qt.ImhNoPredictiveText
-                onAccepted: panel.submit()
-                onActiveFocusChanged: if (activeFocus) scroll.reveal(this)
-                background: Rectangle {
-                    color: "#000000"
-                    border.color: panel.accent
-                    border.width: password.activeFocus ? 3 : 1
+                Text {
+                    text: "Sitzung"
+                    color: panel.accent
+                    font.pixelSize: 12
                 }
-            }
-            Text { text: "Desktop-Sitzung"; color: panel.accent; font.pixelSize: 14 }
-            SessionSelector {
-                id: sessionChoice
-                objectName: "sessionChoice"
-                Layout.fillWidth: true
-                sessions: panel.sessions
-                accent: panel.accent
-                enabled: !panel.busy && count > 0
-                onActiveFocusChanged: if (activeFocus) scroll.reveal(this)
+                SessionSelector {
+                    id: sessionChoice
+                    objectName: "sessionChoice"
+                    Layout.fillWidth: true
+                    sessions: panel.sessions
+                    accent: panel.accent
+                    enabled: !panel.busy && count > 0
+                    onActiveFocusChanged: if (activeFocus)
+                        scroll.reveal(this)
+                }
             }
             GreenButton {
                 objectName: "loginButton"
@@ -141,17 +163,17 @@ FocusScope {
                 text: panel.busy ? "Anmeldung läuft …" : "Anmelden"
                 enabled: panel.canLogin
                 onClicked: panel.submit()
-                onActiveFocusChanged: if (activeFocus) scroll.reveal(this)
+                onActiveFocusChanged: if (activeFocus)
+                    scroll.reveal(this)
             }
             Text {
                 objectName: "statusMessage"
                 Layout.fillWidth: true
-                Layout.minimumHeight: 38
-                text: panel.errorMessage || (userChoice.count === 0 ? "Keine Benutzer verfügbar." :
-                      sessionChoice.count === 0 ? "Keine Desktop-Sitzungen verfügbar." : "")
+                Layout.minimumHeight: 28
+                text: panel.errorMessage || (userChoice.count === 0 ? "Keine Benutzer verfügbar." : sessionChoice.count === 0 ? "Keine Desktop-Sitzungen verfügbar." : "")
                 color: panel.errorMessage ? "#ffb3a7" : panel.accent
                 wrapMode: Text.WordWrap
-                font.pixelSize: 14
+                font.pixelSize: 12
                 Accessible.role: Accessible.StaticText
                 Accessible.name: text
             }

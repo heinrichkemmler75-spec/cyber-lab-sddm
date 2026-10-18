@@ -4,8 +4,8 @@ import QtQuick.Controls.Basic
 Button {
     id: control
     property color accent: "#66ff99"
-    implicitHeight: 40
-    font.pixelSize: 15
+    implicitHeight: 26
+    font.pixelSize: 12
     palette.buttonText: accent
     palette.button: "#000000"
     palette.highlight: accent

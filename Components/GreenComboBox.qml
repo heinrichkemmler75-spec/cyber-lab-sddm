@@ -5,8 +5,8 @@ import QtQuick.Controls.Basic
 ComboBox {
     id: control
     property color accent: "#66ff99"
-    implicitHeight: 40
-    font.pixelSize: 15
+    implicitHeight: 26
+    font.pixelSize: 12
     textRole: "name"
     valueRole: "name"
     palette.text: accent

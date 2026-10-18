@@ -6,6 +6,7 @@ Item {
     property var users
     property int selectedIndex: -1
     property string userName: ""
+    property bool showName: true
     property color accent: "#66ff99"
     implicitHeight: 56
 
@@ -35,6 +36,7 @@ Item {
         }
     }
     Text {
+        visible: profile.showName
         anchors.left: parent.left
         anchors.leftMargin: 70
         anchors.right: parent.right

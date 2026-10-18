@@ -1,0 +1,24 @@
+Cyber Lab SDDM – Bildpaket für Codex
+
+references/
+- final_lab_background.png          Verbindlicher Hintergrund ohne Konsole
+- final_terminal_preview.png        Verbindliches Vorschaubild / Referenz für Endposition
+
+concept/
+- asset_board_v1.png                Frühere Konzepttafel
+- asset_board_v2.png                Aktuelle Konzepttafel mit Phasen, Perspektive und LED-Hinweisen
+
+assets/
+- monitor_frame_candidate.png       Monitorrahmen, leer
+- monitor_mount_candidate.png       Halterung / Monitorgelenk
+- arm_segment_upper_candidate.png   Oberes Armsegment
+- arm_segment_lower_candidate.png   Unteres Armsegment
+- joint_upper_candidate.png         Oberes sichtbares Gelenk
+- joint_lower_candidate.png         Unteres sichtbares Gelenk
+- arm_base_candidate.png            Basis, unten angeschnitten
+- cables_overlay_candidate.png      Kabel-/Schlauchbündel
+- status_led_strip_candidate.png    LED-Statusleiste
+
+Wichtig:
+Diese Asset-Dateien sind Referenz-/Kandidatenbilder und noch nicht final bereinigte Produktionsassets.
+Die Metallteile müssen als intakte, unbeschädigte Laborgeräte interpretiert und bei Bedarf bereinigt werden.

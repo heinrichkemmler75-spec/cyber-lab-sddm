@@ -2,7 +2,7 @@
 
 Ein modulares Qt6/QML-Anmeldetheme für SDDM mit permanent sichtbarem Laborhintergrund und einer grünen Anmeldeoberfläche auf schwarzem Grund.
 
-**Status: Version 0.1.0 – erste statische Implementierung.** Der rechteckige Monitor rechts der Bildmitte ist ein Platzhalter. Arm, endgültige Monitorgrafiken und Einschwenkanimation werden separat entwickelt. Die SDDM-Schnittstellen sind angebunden; eine echte Systemanmeldung wurde noch nicht geprüft.
+**Status: Version 0.2.0 – vermessene Endpose und Drei-Gelenk-Animation.** Der rechteckige Monitor rechts der Bildmitte ist ein Platzhalter. Arm und Monitor werden vorerst mit einfachen QML-Formen dargestellt. Die gelieferten Grafikkandidaten sind ausschließlich Referenzen. Die Drei-Gelenk-Animation endet in der aus dem freigegebenen Vorschaubild vermessenen Pose. Die SDDM-Schnittstellen sind angebunden; eine echte Systemanmeldung wurde noch nicht geprüft.
 
 ## Funktionen
 
@@ -16,7 +16,7 @@ Ein modulares Qt6/QML-Anmeldetheme für SDDM mit permanent sichtbarem Laborhinte
 - Tab/Shift+Tab, Pfeiltasten für Auswahllisten und automatisch nachgeführter Scrollbereich bei kleinen Bildschirmhöhen.
 - Keine virtuelle Bildschirmtastatur.
 
-Der freigegebene Hintergrund `Assets/backgrounds/final_lab_background.png` bleibt unverändert und dauerhaft sichtbar. Er wird proportional bildfüllend dargestellt; je nach Seitenverhältnis werden die Ränder beschnitten. Auf schmalen Bildschirmen verdeckt der Monitor einen größeren Teil des Tanks. Empfohlen sind mindestens 1280×720; 640×480 und 800×600 sind bedienbar, benötigen aber gegebenenfalls Scrollen.
+Der freigegebene Hintergrund `Assets/backgrounds/final_lab_background.png` bleibt unverändert und dauerhaft sichtbar. Er wird proportional bildfüllend dargestellt; je nach Seitenverhältnis werden die Ränder beschnitten. Auf schmalen Bildschirmen verdeckt der Monitor einen größeren Teil des Tanks. Die Monitorgröße folgt exakt dem Referenzbild. Empfohlen sind 1672×941 oder größer; bei 640×480 und 800×600 sind die Bedienelemente entsprechend klein. Eine automatische Vergrößerung würde die vorgegebene Endpose verändern.
 
 ## Aufbau
 
@@ -31,7 +31,10 @@ Components/
   UserProfile.qml                Profilbild und Ersatzanzeige
   SessionSelector.qml            Auswahl der SDDM-Sitzung
   SystemActions.qml              Neustart und Herunterfahren
-  TerminalAnimation.qml          Ausschließlich Schnittstelle für spätere Animation
+  TerminalAnimation.qml          Zeitverlauf der drei Gelenkwinkel und Monitorperspektive
+  SwingArm.qml                   Hierarchische Drei-Gelenk-Kette
+  ArmLink.qml, ArmJoint.qml       Einfache QML-Platzhalter
+  ReferencePose.js               Normierte Messwerte und abgeleitete Endpose
   GreenButton.qml                Gemeinsame Schaltflächengestaltung
   GreenComboBox.qml              Gemeinsame Auswahlgestaltung
 Assets/
@@ -45,9 +48,13 @@ scripts/
 tests/tst_theme.qml             Automatisierte Tests mit simuliertem SDDM
 ```
 
-Position und Größe des Monitors werden in `Main.qml` gesetzt. `TerminalMonitor` nimmt beliebige QML-Inhalte auf. `LoginPanel` erhält Backend und Modelle als Eigenschaften und hängt nicht von der Monitorgeometrie ab.
+Die Endpose wird in `Components/ReferencePose.js` aus den vermessenen Bildkoordinaten berechnet: **x=930, y=320, Breite=404, Höhe=292** bei 1672×941. Normiert: **(0,556220; 0,340064; 0,241627; 0,310308)**, frontal mit 0° Roll/Yaw/Pitch. Hintergrund und Gelenkkette verwenden denselben Maßstab und denselben mittigen Bildbeschnitt. Die Animation verändert nur Winkel-Offsets; alle Offsets enden exakt bei null.
 
-`TerminalAnimation` stellt `target`, `animationEnabled`, `duration`, `running` und das Signal `ready` bereit. Aktuell meldet sie sofort Bereitschaft: keine Bewegung, Überblendung, Verzögerung oder endgültige Arm-/Monitorgrafik. Als zukünftiges Ziel erhält sie ausschließlich den Monitor, niemals den Hintergrund.
+Die [Messdokumentation](docs/reference-pose.md) enthält Bezugspunkte, Messunsicherheiten, Formeln und ein [Overlay](docs/reference-pose.svg). Der angeschnittene Basis-Drehpunkt ist nur näherungsweise rekonstruierbar; die Monitor-Endpose ist davon unabhängig festgelegt.
+
+`TerminalMonitor` nimmt beliebige QML-Inhalte auf. `LoginPanel` erhält Backend und Modelle als Eigenschaften und hängt nicht von der Armbewegung ab. Seine kompakte Oberfläche passt in die ebenfalls vermessene Displayöffnung. Die drei verschachtelten Gelenke übertragen ihre Drehung jeweils auf alle nachfolgenden Teile. `TerminalAnimation` liefert Winkel und Fortschritt sowie `running` und `ready`; das Monitoraufklappen wird zusätzlich perspektivisch dargestellt. Ein-/Ausschalten, Dauer 0 und Größenänderungen führen zur gleichen Zielpose.
+
+Die gelieferten Kandidatengrafiken und Konzepttafeln liegen unverändert unter `docs/image-package/`. Sie werden weder geladen noch installiert; es wurden keine neuen endgültigen Grafiken erzeugt.
 
 ## Voraussetzungen
 
@@ -68,7 +75,7 @@ Die Schnittstellen wurden mit den installierten Themes und dem [SDDM-0.21-Quellt
 
 ```ini
 [General]
-AnimationEnabled=false
+AnimationEnabled=true
 AnimationDuration=800
 GreenColor=#66ff99
 ShowUserPicture=true
@@ -76,8 +83,8 @@ ShowUserPicture=true
 
 | Einstellung | Bedeutung |
 | --- | --- |
-| `AnimationEnabled` | Für die spätere Animation reserviert; aktuell auch bei `true` keine Bewegung. |
-| `AnimationDuration` | Vorbereitete Dauer in Millisekunden, Vorgabe 800; aktuell keine Wartezeit. |
+| `AnimationEnabled` | `true`: Drei-Gelenk-Einschwenken; `false`: sofort die vermessene Endpose. |
+| `AnimationDuration` | Gesamtdauer in Millisekunden, Vorgabe 800; `0` zeigt sofort die Endpose. |
 | `GreenColor` | Qt-Farbwert für Schrift, Bedienelemente und Rahmen. Für gute Lesbarkeit einen hellen Grünton verwenden. |
 | `ShowUserPicture` | `true` zeigt Profilbereich und Ersatzanzeige, `false` blendet den Profilbereich aus. Die Benutzerwahl bleibt verfügbar. |
 
@@ -110,10 +117,10 @@ Die Tests verwenden ein simuliertes Backend und ausschließlich erfundene Zugang
 ### Tatsächlich durchgeführt
 
 - `qmllint` für `Main.qml` und alle Komponenten: ohne Warnungen. Die vier von SDDM eingespeisten Kontextvariablen sind gezielt von der statischen Prüfung unqualifizierter Zugriffe ausgenommen und werden im echten Greeter geladen.
-- Qt-Tests: **12 bestanden, 0 fehlgeschlagen** einschließlich Initialisierung und Aufräumen.
+- Qt-Tests: **15 bestanden, 0 fehlgeschlagen** einschließlich Initialisierung und Aufräumen.
 - Geprüft: Enter und Anmeldeschaltfläche, übergebene Zugangsdaten/Sitzung, Schutz vor doppelter Anmeldung, Fehleranzeige, geleertes Passwort und wiederhergestellter Fokus, Benutzer-/Sitzungswechsel, Profilbild und Ersatzanzeige, Systemaktionsaufrufe und deren Verfügbarkeit, leere Modelle.
-- Geprüft: Fokusfolge und automatisches Scrollen bei 640×480; Layout bei **640×480, 800×600, 1280×720 und 1920×1080**; Hintergrund bleibt geladen und sichtbar; Aktivieren der vorbereiteten Animation bewegt nichts; Profilbereich lässt sich ausblenden.
-- Gerenderte Prüfbilder visuell kontrolliert, insbesondere 640×480 und 1280×720.
+- Geprüft: Fokusfolge und automatisches Scrollen bei 640×480; Layout bei **640×480, 800×600, 1280×720, 1672×941 und 1920×1080**; Hintergrund bleibt geladen und sichtbar; Endpose stimmt mit den Referenzkoordinaten überein; Profilbereich lässt sich ausblenden.
+- Gerenderte Endpose und Zwischenphasen visuell kontrolliert. Numerisch geprüft: konstante Segmentlängen, Bewegung aller drei Gelenke, exakte Endpose nach 800 ms, Ausschalten während der Bewegung, Dauer 0 und Größenänderung während der Bewegung.
 - Echter SDDM-Greeter im Testmodus: Theme geladen, kein Rückfall auf das eingebettete Theme, keine QML-Lade-, Bindungs- oder Importfehler.
 - Shell-Skripte mit `bash -n` geprüft.
 
@@ -128,13 +135,13 @@ Erst prüfen, anschließend bei Bedarf ausdrücklich nur die Dateien kopieren:
 sudo ./scripts/install.sh --copy-only
 ```
 
-Das Skript installiert QML-Dateien, beide vorhandenen Bilder, Lizenz, Metadaten und `theme.conf` nach `/usr/share/sddm/themes/cyber-lab-sddm/` mit lesbaren Dateirechten. Eine erneute Ausführung aktualisiert diese Dateien. Es bearbeitet keine SDDM-Konfiguration, aktiviert kein Theme und startet keinen Dienst neu. **Die Installation wurde in dieser Entwicklungsrunde nicht ausgeführt.**
+Das Skript installiert QML-Dateien, das Geometriemodul, beide vorhandenen Bilder, Lizenz, Metadaten und `theme.conf` nach `/usr/share/sddm/themes/cyber-lab-sddm/` mit lesbaren Dateirechten. Eine erneute Ausführung aktualisiert diese Dateien. Es bearbeitet keine SDDM-Konfiguration, aktiviert kein Theme und startet keinen Dienst neu. **Die Installation wurde in dieser Entwicklungsrunde nicht ausgeführt.**
 
 Die spätere Aktivierung erfolgt bewusst manuell, beispielsweise über die KDE-Systemeinstellungen für den SDDM-Anmeldebildschirm. Vor einer produktiven Nutzung ist eine gesonderte echte Anmeldung nötig. Dabei muss insbesondere geprüft werden, ob der Systembenutzer `sddm` die gewünschten Benutzerbilder lesen darf.
 
 ## Bekannte Einschränkungen und nächste Schritte
 
-- Statischer Platzhalter; endgültige Grafiken und die Einschwenkanimation fehlen absichtlich.
+- QML-Platzhalter mit Animation; endgültige Arm- und Monitorgrafiken fehlen absichtlich. Die Gelenke sind eine planare Rekonstruktion mit perspektivischem Monitoraufklappen; aus einem einzelnen Bild ist keine eindeutige 3D-Mechanik ableitbar.
 - Standardanmeldung mit Benutzername und Passwort. Zusätzliche PAM-Dialoge wie Passwortwechsel oder mehrstufige Abfragen sind nicht implementiert.
 - Es werden die von SDDM angebotenen Benutzer verwendet; keine freie Eingabe versteckter Konten.
 - Deutsche Oberflächentexte; keine zusätzliche Sprachauswahl, Tastaturbelegungsauswahl oder Bildschirmtastatur.
@@ -143,6 +150,6 @@ Die spätere Aktivierung erfolgt bewusst manuell, beispielsweise über die KDE-S
 
 ## Gestalterisches Zielbild
 
-Das folgende freigegebene Vorschaubild zeigt die **spätere Gestaltung mit mechanischem Arm**, nicht den Funktionsumfang von Version 0.1.0. Die Metadaten verwenden dieses vorhandene Vorschaubild. Der aktuelle Monitor besteht ausschließlich aus einfachen QML-Rechtecken.
+Das folgende freigegebene Vorschaubild zeigt die **spätere grafische Gestaltung mit mechanischem Arm**. Die Einzelgrafiken sind noch nicht produktionsfertig. Die Metadaten verwenden dieses vorhandene Vorschaubild. Der aktuelle Monitor besteht ausschließlich aus einfachen QML-Rechtecken.
 
 ![Gestalterisches Zielbild mit Arm und Terminal](Assets/previews/final_terminal_preview.png)

@@ -8,7 +8,7 @@ fi
 destination=/usr/share/sddm/themes/cyber-lab-sddm
 install -d -m 755 "$destination" "$destination/Components" "$destination/Assets/backgrounds" "$destination/Assets/previews"
 install -m 644 "$root/Main.qml" "$root/metadata.desktop" "$root/theme.conf" "$root/LICENSE" "$destination/"
-install -m 644 "$root"/Components/*.qml "$destination/Components/"
+install -m 644 "$root"/Components/*.qml "$root"/Components/*.js "$destination/Components/"
 install -m 644 "$root/Assets/backgrounds/final_lab_background.png" "$destination/Assets/backgrounds/"
 install -m 644 "$root/Assets/previews/final_terminal_preview.png" "$destination/Assets/previews/"
 printf 'Kopiert nach %s. Die aktive SDDM-Konfiguration wurde nicht verändert.\n' "$destination"
