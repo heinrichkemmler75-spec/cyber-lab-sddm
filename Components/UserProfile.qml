@@ -11,15 +11,18 @@ Item {
     implicitHeight: 56
 
     Rectangle {
-        width: 56
-        height: 56
+        // Follow the actual size supplied by the layout; keep the portrait
+        // square without stretching either the image or the fallback avatar.
+        width: profile.showName ? 56 : Math.min(profile.width, profile.height)
+        height: width
+        anchors.verticalCenter: parent.verticalCenter
         color: "#0b1910"
         border.color: profile.accent
         Text {
             anchors.centerIn: parent
             text: profile.userName ? profile.userName.charAt(0).toUpperCase() : "?"
             color: profile.accent
-            font.pixelSize: 26
+            font.pixelSize: Math.round(parent.width * 0.46)
         }
         Repeater {
             model: profile.users
