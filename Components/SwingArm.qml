@@ -156,9 +156,15 @@ Item {
                                 sprite: ""
                                 visible: false
                             }
+                            // The monitor mount is a single mechanical part.
+                            // Its rear housing is aligned to the right monitor
+                            // edge and the vertical center of the monitor.
+                            // Keep the wrist pivot at the calibrated position:
+                            // duplicating the same sprite in an ArmJoint would
+                            // make the connection appear to have two joints.
                             Image {
-                                x: -87
-                                y: -60
+                                x: arm.pose.monitorX + arm.pose.width - 30
+                                y: arm.pose.monitorY + arm.pose.height / 2 - height / 2
                                 width: 115
                                 height: 120
                                 z: -1
@@ -167,12 +173,6 @@ Item {
                                 smooth: true
                                 mipmap: true
                             }
-                        }
-                        ArmJoint {
-                            sprite: "../Assets/arm/monitor_mount.png"
-                            accent: arm.accent
-                            motorActive: arm.wristMoving
-                            z: 3
                         }
                     }
                     ArmJoint {
