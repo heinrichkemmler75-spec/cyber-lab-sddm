@@ -65,8 +65,13 @@ Item {
                     smooth: true
                 }
                 ArmLink {
+                    objectName: "lowerArmBeam"
                     width: arm.pose.lowerLength
-                    transform: Rotation { origin.y: 10; angle: arm.pose.shoulderAngle }
+                    // Join the artwork to the pivot centers; the sprite's
+                    // transparent ends otherwise stop short of the elbow.
+                    startOverlap: 12
+                    endOverlap: 22
+                    transform: Rotation { origin.y: 0; angle: arm.pose.shoulderAngle }
                     sprite: "../Assets/arm/lower_link.png"
                     accent: arm.accent
                 }
@@ -114,9 +119,17 @@ Item {
                         }
                     }
                     ArmLink {
+                        objectName: "upperArmBeam"
                         width: Math.hypot(arm.upperX, elbow.projectedY)
+                        // Keep the artwork beneath both the elbow cover and
+                        // the monitor mount. Optical beam endpoints extend
+                        // slightly beyond the nominal joint-to-joint vector.
+                        startOverlap: 24
+                        endOverlap: 24
                         transform: Rotation {
-                            origin.y: 10
+                            // The beam image is centered on local Y=0.
+                            // Rotating about Y=10 shifted it beneath the elbow.
+                            origin.y: 0
                             angle: Math.atan2(elbow.projectedY, arm.upperX) * 180 / Math.PI
                         }
                         sprite: "../Assets/arm/upper_link.png"
