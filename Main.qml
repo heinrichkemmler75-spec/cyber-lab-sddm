@@ -22,7 +22,18 @@ Item {
         ? Math.max(0, Number(root.themeConfig.AnimationDuration)) : 3000
     readonly property real sceneScale: Math.max(width / ReferencePose.imageWidth, height / ReferencePose.imageHeight)
 
-    BackgroundScene { objectName: "background"; anchors.fill: parent }
+    BackgroundScene {
+        objectName: "background"
+        anchors.fill: parent
+        // Match the exact keys used by KDE's SDDM configuration module.
+        backgroundPath: root.themeConfig.background
+            ? String(root.themeConfig.background)
+            : "Assets/backgrounds/final_lab_background.png"
+        backgroundType: root.themeConfig.type
+            ? String(root.themeConfig.type) : "image"
+        backgroundColor: root.themeConfig.color
+            ? root.themeConfig.color : "#000000"
+    }
 
     Item {
         id: referenceScene
