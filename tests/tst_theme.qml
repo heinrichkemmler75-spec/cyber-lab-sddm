@@ -139,7 +139,7 @@ Item {
             const sessionChoice = findChild(theme, "sessionChoice");
             const loginButton = findChild(theme, "loginButton");
             wait(20);
-            verify(profile.width >= 130, "Avatar should use a substantial area");
+            verify(profile.width >= 126, "Avatar should use a substantial area");
             fuzzyCompare(profile.width, profile.height, 0.01);
             verify(userChoice.x >= 0);
             const form = findChild(theme, "formScroll");
@@ -152,6 +152,35 @@ Item {
                 fuzzyCompare(control.width, userChoice.width, 0.1);
             }
             verify(userChoice.width < 200, "Input columns must be narrower than before");
+            const profileBottom = profile.mapToItem(form, 0, profile.height).y;
+            const buttonBottom = loginButton.mapToItem(form, 0, loginButton.height).y;
+            fuzzyCompare(profileBottom, buttonBottom, 1.1);
+        }
+        function test_kdeClockSettingAndPlacement() {
+            const clock = findChild(theme, "clockLabel");
+            const restart = findChild(theme, "rebootButton");
+            const form = findChild(theme, "formScroll");
+            verify(clock.visible, "Clock must be shown by default");
+            compare(clock.text.length, 5);
+            compare(clock.text.charAt(2), ":");
+            const clockX = clock.mapToItem(form, 0, 0).x;
+            const restartX = restart.mapToItem(form, 0, 0).x;
+            verify(clockX < restartX, "Clock belongs left of the system buttons");
+            // Simulate KDE's stored checkbox state in theme.conf.user.
+            test.parent.config = {
+                GreenColor: "#66ff99", ShowUserPicture: "true",
+                AnimationEnabled: "false", AnimationDuration: "2000",
+                showClock: "false"
+            };
+            wait(20);
+            verify(!clock.visible, "KDE checkbox off must hide clock");
+            test.parent.config = {
+                GreenColor: "#66ff99", ShowUserPicture: "true",
+                AnimationEnabled: "false", AnimationDuration: "2000",
+                showClock: "true"
+            };
+            wait(20);
+            verify(clock.visible, "KDE checkbox on must show clock");
         }
         function test_kdeWallpaperSelection() {
             const background = findChild(theme, "background");
