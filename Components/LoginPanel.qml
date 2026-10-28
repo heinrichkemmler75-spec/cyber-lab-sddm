@@ -10,6 +10,8 @@ FocusScope {
     required property var sessions
     property color accent: "#66ff99"
     property bool showAvatar: true
+    property bool showClock: true
+    property string clockText: Qt.formatTime(new Date(), "HH:mm")
     property bool busy: false
     property string errorMessage: ""
     readonly property string selectedUser: userChoice.currentValue || ""
@@ -26,6 +28,14 @@ FocusScope {
         busy = true;
         backend.login(selectedUser, password.text, selectedSession);
         password.clear();
+    }
+
+    // Update the local system time without polling while the clock is disabled.
+    Timer {
+        interval: 1000
+        repeat: true
+        running: panel.showClock
+        onTriggered: panel.clockText = Qt.formatTime(new Date(), "HH:mm")
     }
 
     Connections {
@@ -83,8 +93,8 @@ FocusScope {
                 spacing: 6
                 UserProfile {
                     objectName: "userProfile"
-                    Layout.preferredWidth: 132
-                    Layout.preferredHeight: 132
+                    Layout.preferredWidth: 128
+                    Layout.preferredHeight: 128
                     visible: panel.showAvatar
                     showName: false
                     users: panel.users
@@ -172,6 +182,20 @@ FocusScope {
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 4
+                // The clock lives in the bottom-left of the LCD, opposite
+                // the shutdown controls. KDE controls visibility via showClock.
+                Text {
+                    objectName: "clockLabel"
+                    visible: panel.showClock
+                    text: panel.clockText
+                    color: panel.accent
+                    font.family: "monospace"
+                    font.pixelSize: 15
+                    font.bold: true
+                    Layout.alignment: Qt.AlignLeft | Qt.AlignVCenter
+                    Accessible.role: Accessible.StaticText
+                    Accessible.name: "Uhrzeit " + panel.clockText
+                }
                 Text {
                     objectName: "statusMessage"
                     Layout.fillWidth: true
