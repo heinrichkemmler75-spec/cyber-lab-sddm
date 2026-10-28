@@ -9,7 +9,7 @@ if ! command -v sddm-greeter-qt6 >/dev/null; then
     printf 'Qt6-Greeter sddm-greeter-qt6 fehlt.\n' >&2
     exit 1
 fi
-for file in Main.qml theme.conf metadata.desktop Assets/backgrounds/final_lab_background.png; do
+for file in Main.qml theme.conf metadata.desktop Assets/backgrounds/final_lab_background.png Assets/backgrounds/lab_background_01.png Assets/backgrounds/lab_background_02.png; do
     test -r "$root/$file" || { printf 'Fehlende Datei: %s\n' "$file" >&2; exit 1; }
 done
 exec sddm-greeter-qt6 --test-mode --theme "$root"
