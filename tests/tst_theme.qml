@@ -153,6 +153,59 @@ Item {
             }
             verify(userChoice.width < 200, "Input columns must be narrower than before");
         }
+        function test_kdeWallpaperSelection() {
+            const background = findChild(theme, "background");
+            const choices = [
+                "final_lab_background.png",
+                "lab_background_01.png",
+                "lab_background_02.png"
+            ];
+            for (const name of choices) {
+                const relativePath = "Assets/backgrounds/" + name;
+                test.parent.config = {
+                    GreenColor: "#66ff99",
+                    ShowUserPicture: "true",
+                    AnimationEnabled: "false",
+                    AnimationDuration: "2000",
+                    background: relativePath,
+                    type: "image"
+                };
+                wait(30);
+                compare(background.source.toString(),
+                        Qt.resolvedUrl("../" + relativePath).toString());
+                compare(background.status, Image.Ready);
+            }
+
+            // KDE KCM may use a complete file:// path for selected images.
+            const absoluteUrl = Qt.resolvedUrl("../Assets/backgrounds/lab_background_01.png").toString();
+            test.parent.config = {
+                GreenColor: "#66ff99",
+                ShowUserPicture: "true",
+                AnimationEnabled: "false",
+                AnimationDuration: "2000",
+                background: absoluteUrl,
+                type: "image"
+            };
+            wait(30);
+            compare(background.source.toString(), absoluteUrl);
+            compare(background.status, Image.Ready);
+
+            // The KCM can also request a solid background color.
+            test.parent.config = {
+                GreenColor: "#66ff99",
+                ShowUserPicture: "true",
+                AnimationEnabled: "false",
+                AnimationDuration: "2000",
+                type: "color",
+                background: "",
+                color: "#123456"
+            };
+            wait(30);
+            compare(background.backgroundType, "color");
+            compare(background.backgroundColor.toString(), "#123456");
+            compare(background.source.toString(), "");
+            verify(background.visible);
+        }
         function test_avatar() {
             const profile = findChild(theme, "userProfile");
             verify(profile.visible);
