@@ -6,6 +6,10 @@ Item {
     id: link
     property color accent: "#66ff99"
     property url sprite: ""
+    // Render-only overscan: hide the ends of the beam beneath the joint covers.
+    // This never changes the length or position of the kinematic link.
+    property real startOverlap: 0
+    property real endOverlap: 0
     width: 180
     height: 20
 
@@ -25,9 +29,9 @@ Item {
         asynchronous: false
         smooth: true
         mipmap: true
-        x: 0
+        x: -link.startOverlap
         y: -34
-        width: link.width
+        width: link.width + link.startOverlap + link.endOverlap
         height: 68
         // Candidate beams already have a particular camera angle.
         // Keep their ends at the joint coordinates; do not scale the chain itself.
