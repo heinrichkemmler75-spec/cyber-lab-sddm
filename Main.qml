@@ -17,6 +17,10 @@ Item {
     // qmllint enable unqualified
     readonly property color accent: root.themeConfig.GreenColor || "#66ff99"
     readonly property bool showAvatar: String(root.themeConfig.ShowUserPicture).toLowerCase() !== "false"
+    // KDE SDDM writes the lowercase [General] showClock option into theme.conf.user.
+    // Missing values retain the enabled default; an explicit false disables it.
+    readonly property bool showClock: !["false", "0", "off"].includes(
+        String(root.themeConfig.showClock).toLowerCase())
     readonly property bool animationEnabled: String(root.themeConfig.AnimationEnabled).toLowerCase() === "true"
     readonly property int animationDuration: isFinite(Number(root.themeConfig.AnimationDuration))
         ? Math.max(0, Number(root.themeConfig.AnimationDuration)) : 3000
@@ -68,6 +72,7 @@ Item {
                     sessions: root.availableSessions
                     accent: root.accent
                     showAvatar: root.showAvatar
+                    showClock: root.showClock
                 }
             }
         }
