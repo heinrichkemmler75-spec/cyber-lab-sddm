@@ -16,7 +16,19 @@ Ein modulares Qt6/QML-Anmeldetheme für SDDM mit permanent sichtbarem Laborhinte
 - Tab/Shift+Tab, Pfeiltasten für Auswahllisten und automatisch nachgeführter Scrollbereich bei kleinen Bildschirmhöhen.
 - Keine virtuelle Bildschirmtastatur.
 
-Der freigegebene Hintergrund `Assets/backgrounds/final_lab_background.png` bleibt unverändert und dauerhaft sichtbar. Er wird proportional bildfüllend dargestellt; je nach Seitenverhältnis werden die Ränder beschnitten. Auf schmalen Bildschirmen verdeckt der Monitor einen größeren Teil des Tanks. Die Monitorgröße folgt exakt dem Referenzbild. Empfohlen sind 1672×941 oder größer; bei 640×480 und 800×600 sind die Bedienelemente entsprechend klein. Eine automatische Vergrößerung würde die vorgegebene Endpose verändern.
+Der Standardhintergrund `Assets/backgrounds/final_lab_background.png` bleibt erhalten. Die zwei zusätzlichen Laborhintergründe `Assets/backgrounds/lab_background_01.png` und `Assets/backgrounds/lab_background_02.png` sind über die Hintergrundauswahl in KDE Plasma auswählbar. Er wird proportional bildfüllend dargestellt; je nach Seitenverhältnis werden die Ränder beschnitten. Auf schmalen Bildschirmen verdeckt der Monitor einen größeren Teil des Tanks. Die Monitorgröße folgt exakt dem Referenzbild. Empfohlen sind 1672×941 oder größer; bei 640×480 und 800×600 sind die Bedienelemente entsprechend klein. Eine automatische Vergrößerung würde die vorgegebene Endpose verändern.
+
+## Hintergründe über die KDE-Systemeinstellungen wählen
+
+Cyber Lab verwendet für die Hintergrundauswahl das native SDDM/KDE-Schema. In **Systemeinstellungen → Farben & Designs → Anmeldebildschirm (SDDM)** das Theme **Cyber Lab** auswählen und über **Hintergrund ändern** eines der mitgelieferten Bilder oder eine eigene Grafik auswählen. Je nach KDE-Plasma-Version können die Beschriftungen abweichen. Die mitgelieferten Bilder liegen nach der Installation unter:
+
+- `/usr/share/sddm/themes/cyber-lab-sddm/Assets/backgrounds/final_lab_background.png` (Standard, Biolabor)
+- `/usr/share/sddm/themes/cyber-lab-sddm/Assets/backgrounds/lab_background_01.png` (Maschinenlabor)
+- `/usr/share/sddm/themes/cyber-lab-sddm/Assets/backgrounds/lab_background_02.png` (Portallabor)
+
+Das KDE-Modul für SDDM erwartet den **kleingeschriebenen** Eintrag `[General] background` aus `theme.conf`. Nach der Auswahl schreibt KDE den systemweiten Override in `theme.conf.user`; die Datei ist nutzerseitige Konfiguration und wird vom Installationsskript **nicht** überschrieben. Relative Pfade werden vom Theme-Verzeichnis aus aufgelöst; KDE kann außerdem absolute Dateipfade und `file://`-URLs eintragen. Die über KDE gesetzte Bild-/Farbwahl (`type=image` beziehungsweise `type=color`) wird unterstützt. Die Konfiguration setzt voraus, dass SDDM auf die ausgewählte Bilddatei zugreifen kann.
+
+Das Installationsskript kopiert sämtliche Dateien aus `Assets/`, einschließlich aller Hintergründe, Monitor-Posen, Gelenkgrafiken und LEDs. Die Suche nach neuen Themes im KDE-Dialog erfolgt über **Neue Anmeldebildschirme herunterladen** / KDE Store; ein öffentliches GitHub-Repository wird dadurch **nicht** automatisch im Store gelistet. Für eine Veröffentlichung ist weiterhin ein eigener Store-Eintrag mit einem installierbaren Theme-Paket notwendig.
 
 ## Aufbau
 
@@ -38,9 +50,9 @@ Components/
   GreenButton.qml                Gemeinsame Schaltflächengestaltung
   GreenComboBox.qml              Gemeinsame Auswahlgestaltung
 Assets/
-  backgrounds/final_lab_background.png
+  backgrounds/final_lab_background.png, lab_background_01.png, lab_background_02.png
   previews/final_terminal_preview.png
-  arm/, terminal/, icons/        Reserviert für spätere Entwicklung
+  arm/, terminal/, leds/         Verwendete Grafik-Assets einschließlich Monitor-Posen
 scripts/
   test.sh                        Echter SDDM-Greeter im Testmodus
   check.sh                       Statische Prüfung, Qt-Tests, Greeter-Ladetest
