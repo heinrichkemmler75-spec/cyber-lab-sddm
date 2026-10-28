@@ -75,13 +75,16 @@ FocusScope {
                 Layout.fillWidth: true
                 elide: Text.ElideRight
             }
+            // The portrait and the login controls share the available height.
+            // The portrait remains square; all four controls use the remaining
+            // width rather than stretching across the full screen.
             RowLayout {
                 Layout.fillWidth: true
                 spacing: 6
                 UserProfile {
                     objectName: "userProfile"
-                    Layout.preferredWidth: 62
-                    Layout.preferredHeight: 62
+                    Layout.preferredWidth: 132
+                    Layout.preferredHeight: 132
                     visible: panel.showAvatar
                     showName: false
                     users: panel.users
@@ -91,11 +94,13 @@ FocusScope {
                 }
                 ColumnLayout {
                     Layout.fillWidth: true
-                    spacing: 2
+                    Layout.alignment: Qt.AlignVCenter
+                    spacing: 4
                     GreenComboBox {
                         id: userChoice
                         objectName: "userChoice"
                         Layout.fillWidth: true
+                        Layout.preferredHeight: 29
                         accent: panel.accent
                         model: panel.users
                         enabled: !panel.busy && count > 0
@@ -116,6 +121,7 @@ FocusScope {
                         id: password
                         objectName: "passwordField"
                         Layout.fillWidth: true
+                        Layout.preferredHeight: 29
                         implicitHeight: 25
                         color: panel.accent
                         font.pixelSize: 13
@@ -139,30 +145,29 @@ FocusScope {
                             border.width: password.activeFocus ? 3 : 1
                         }
                     }
+                    SessionSelector {
+                        id: sessionChoice
+                        objectName: "sessionChoice"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 29
+                        sessions: panel.sessions
+                        accent: panel.accent
+                        enabled: !panel.busy && count > 0
+                        onActiveFocusChanged: if (activeFocus)
+                            scroll.reveal(this)
+                    }
+                    GreenButton {
+                        objectName: "loginButton"
+                        Layout.fillWidth: true
+                        Layout.preferredHeight: 29
+                        accent: panel.accent
+                        text: panel.busy ? "Anmeldung läuft …" : "Anmelden"
+                        enabled: panel.canLogin
+                        onClicked: panel.submit()
+                        onActiveFocusChanged: if (activeFocus)
+                            scroll.reveal(this)
+                    }
                 }
-            }
-            RowLayout {
-                Layout.fillWidth: true
-                SessionSelector {
-                    id: sessionChoice
-                    objectName: "sessionChoice"
-                    Layout.fillWidth: true
-                    sessions: panel.sessions
-                    accent: panel.accent
-                    enabled: !panel.busy && count > 0
-                    onActiveFocusChanged: if (activeFocus)
-                        scroll.reveal(this)
-                }
-            }
-            GreenButton {
-                objectName: "loginButton"
-                Layout.fillWidth: true
-                accent: panel.accent
-                text: panel.busy ? "Anmeldung läuft …" : "Anmelden"
-                enabled: panel.canLogin
-                onClicked: panel.submit()
-                onActiveFocusChanged: if (activeFocus)
-                    scroll.reveal(this)
             }
             RowLayout {
                 Layout.fillWidth: true
