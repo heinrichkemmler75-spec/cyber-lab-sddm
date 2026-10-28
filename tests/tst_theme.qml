@@ -132,6 +132,27 @@ Item {
             keyClick(Qt.Key_Tab);
             verify(password.activeFocus);
         }
+        function test_largeAvatarAndCompactInputs() {
+            const profile = findChild(theme, "userProfile");
+            const userChoice = findChild(theme, "userChoice");
+            const passwordField = findChild(theme, "passwordField");
+            const sessionChoice = findChild(theme, "sessionChoice");
+            const loginButton = findChild(theme, "loginButton");
+            wait(20);
+            verify(profile.width >= 130, "Avatar should use a substantial area");
+            fuzzyCompare(profile.width, profile.height, 0.01);
+            verify(userChoice.x >= 0);
+            const form = findChild(theme, "formScroll");
+            const profileLeft = profile.mapToItem(form, 0, 0).x;
+            const userLeft = userChoice.mapToItem(form, 0, 0).x;
+            verify(userLeft > profileLeft + profile.width, "Inputs must be to the right of portrait");
+            const left = userLeft;
+            for (const control of [passwordField, sessionChoice, loginButton]) {
+                fuzzyCompare(control.mapToItem(form, 0, 0).x, left, 0.1);
+                fuzzyCompare(control.width, userChoice.width, 0.1);
+            }
+            verify(userChoice.width < 200, "Input columns must be narrower than before");
+        }
         function test_avatar() {
             const profile = findChild(theme, "userProfile");
             verify(profile.visible);
